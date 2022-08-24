@@ -92,11 +92,6 @@ func (h *handlersAuth) Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user := models.User{
-		Email:    request.Email,
-		Password: request.Password,
-	}
-
 	user, err := h.AuthRepository.Login(request.Email)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
@@ -113,11 +108,7 @@ func (h *handlersAuth) Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	timeMilli := time.Now()
-
 	claims := jwt.MapClaims{}
-	IdTrans := timeMilli.Unix()
-	claims["time"] = IdTrans
 	claims["id"] = user.ID
 	claims["exp"] = time.Now().Add(time.Hour * 2).Unix()
 
@@ -134,13 +125,6 @@ func (h *handlersAuth) Login(w http.ResponseWriter, r *http.Request) {
 		Token:  token,
 		Status: user.Status,
 	}
-
-	createOrder := models.Transaction{
-		ID:     IdTrans,
-		UserID: user.ID,
-	}
-
-	h.AuthRepository.CreateNilTransaction(createOrder)
 
 	w.Header().Set("Content-Type", "application/json")
 	response := dto.SuccessResult{Code: "Success", Data: loginResponse}
