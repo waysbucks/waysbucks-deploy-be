@@ -48,7 +48,6 @@ func (h *handlersProfile) GetProfile(w http.ResponseWriter, r *http.Request) {
 		response := dto.ErrorResult{Code: http.StatusBadRequest, Message: err.Error()}
 		json.NewEncoder(w).Encode(response)
 	}
-	profiles.Image = path_file + profiles.Image
 
 	w.WriteHeader(http.StatusOK)
 	response := dto.SuccessResult{Code: "Success", Data: convertResponseProfile(profiles)}

@@ -13,8 +13,6 @@ import (
 	"github.com/gorilla/mux"
 )
 
-var path_file_cart = "http://localhost:5000/uploads/"
-
 type handlersCart struct {
 	CartRepository repositories.CartRepository
 }
@@ -31,10 +29,6 @@ func (h *handlersCart) FindCarts(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		response := dto.ErrorResult{Code: http.StatusBadRequest, Message: err.Error()}
 		json.NewEncoder(w).Encode(response)
-	}
-
-	for i, p := range carts {
-		carts[i].Product.Image = path_file_cart + p.Product.Image
 	}
 
 	w.WriteHeader(http.StatusOK)
@@ -189,10 +183,6 @@ func (h *handlersCart) FindCartsByID(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		response := dto.ErrorResult{Code: http.StatusBadRequest, Message: err.Error()}
 		json.NewEncoder(w).Encode(response)
-	}
-
-	for i, p := range cart {
-		cart[i].Product.Image = path_file_cart + p.Product.Image //image name
 	}
 
 	w.WriteHeader(http.StatusOK)

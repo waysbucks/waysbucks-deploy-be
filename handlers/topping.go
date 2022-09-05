@@ -17,8 +17,6 @@ import (
 	"github.com/gorilla/mux"
 )
 
-var path_file = "http://localhost:5000/uploads/"
-
 type handlersTopping struct {
 	ToppingRepository repositories.ToppingRepository
 }
@@ -37,10 +35,6 @@ func (h *handlersTopping) FindToppings(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(response)
 	}
 
-	for i, p := range toppings {
-		toppings[i].Image = path_file + p.Image
-	}
-
 	w.WriteHeader(http.StatusOK)
 	response := dto.SuccessResult{Code: "Success", Data: toppings}
 	json.NewEncoder(w).Encode(response)
@@ -57,8 +51,6 @@ func (h *handlersTopping) GetTopping(w http.ResponseWriter, r *http.Request) {
 		response := dto.ErrorResult{Code: http.StatusBadRequest, Message: err.Error()}
 		json.NewEncoder(w).Encode(response)
 	}
-
-	topping.Image = path_file + topping.Image
 
 	w.WriteHeader(http.StatusOK)
 	response := dto.SuccessResult{Code: "Success", Data: topping}

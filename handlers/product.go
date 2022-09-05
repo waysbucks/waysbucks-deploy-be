@@ -18,8 +18,6 @@ import (
 	"github.com/gorilla/mux"
 )
 
-var path_file_product = "http://localhost:5000/uploads/"
-
 type handlersProduct struct {
 	ProductRepository repositories.ProductRepository
 }
@@ -38,10 +36,6 @@ func (h *handlersProduct) FindProducts(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(response)
 	}
 
-	// for i, p := range products {
-	// 	products[i].Image = path_file_product + p.Image
-	// }
-
 	w.WriteHeader(http.StatusOK)
 	response := dto.SuccessResult{Code: "Success", Data: products}
 	json.NewEncoder(w).Encode(response)
@@ -58,8 +52,6 @@ func (h *handlersProduct) GetProduct(w http.ResponseWriter, r *http.Request) {
 		response := dto.ErrorResult{Code: http.StatusBadRequest, Message: err.Error()}
 		json.NewEncoder(w).Encode(response)
 	}
-
-	product.Image = path_file + product.Image
 
 	w.WriteHeader(http.StatusOK)
 	response := dto.SuccessResult{Code: "Success", Data: product}
