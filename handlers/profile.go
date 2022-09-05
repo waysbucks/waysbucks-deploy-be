@@ -1,14 +1,18 @@
 package handlers
 
 import (
+	"context"
 	"encoding/json"
 	"net/http"
+	"os"
 	"strconv"
 	profiledto "waysbucks/dto/profile"
 	dto "waysbucks/dto/result"
 	"waysbucks/models"
 	"waysbucks/repositories"
 
+	"github.com/cloudinary/cloudinary-go/v2"
+	"github.com/cloudinary/cloudinary-go/v2/api/uploader"
 	"github.com/go-playground/validator/v10"
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/gorilla/mux"
@@ -102,13 +106,24 @@ func (h *handlersProfile) UpdateProfile(w http.ResponseWriter, r *http.Request) 
 	id := int(userInfo["id"].(float64))
 
 	dataContex := r.Context().Value("dataFile")
-	filename := dataContex.(string)
+	filepath := dataContex.(string)
+
+	var ctx = context.Background()
+	var CLOUD_NAME = os.Getenv("CLOUD_NAME")
+	var API_KEY = os.Getenv("API_KEY")
+	var API_SECRET = os.Getenv("API_SECRET")
+
+	// Add your Cloudinary credentials ...
+	cld, _ := cloudinary.NewFromParams(CLOUD_NAME, API_KEY, API_SECRET)
+
+	// Upload file to Cloudinary ...
+	resp, _ := cld.Upload.Upload(ctx, filepath, uploader.UploadParams{Folder: "Waysbean"})
 
 	postalcode, _ := strconv.Atoi(r.FormValue("postal_code"))
 	request := profiledto.UpdateProfile{
 		Address:    r.FormValue("address"),
 		PostalCode: postalcode,
-		Image:      filename,
+		Image:      resp.SecureURL,
 	}
 
 	profile, err := h.ProfileRepository.GetProfile(int(id))
@@ -126,8 +141,8 @@ func (h *handlersProfile) UpdateProfile(w http.ResponseWriter, r *http.Request) 
 		profile.PostalCode = request.PostalCode
 	}
 
-	if filename != "false" {
-		profile.Image = filename
+	if filepath != "false" {
+		profile.Image = request.Image
 	}
 
 	data, err := h.ProfileRepository.UpdateProfile(profile)
