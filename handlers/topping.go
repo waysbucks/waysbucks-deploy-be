@@ -1,14 +1,19 @@
 package handlers
 
 import (
+	"context"
 	"encoding/json"
+	"fmt"
 	"net/http"
+	"os"
 	"strconv"
 	dto "waysbucks/dto/result"
 	toppingdto "waysbucks/dto/topping"
 	"waysbucks/models"
 	"waysbucks/repositories"
 
+	"github.com/cloudinary/cloudinary-go/v2"
+	"github.com/cloudinary/cloudinary-go/v2/api/uploader"
 	"github.com/gorilla/mux"
 )
 
@@ -64,7 +69,22 @@ func (h *handlersTopping) CreateTopping(w http.ResponseWriter, r *http.Request) 
 	w.Header().Set("Content-Type", "application/json")
 
 	dataContex := r.Context().Value("dataFile") // add this code
-	filename := dataContex.(string)
+	filepath := dataContex.(string)
+
+	var ctx = context.Background()
+	var CLOUD_NAME = os.Getenv("CLOUD_NAME")
+	var API_KEY = os.Getenv("API_KEY")
+	var API_SECRET = os.Getenv("API_SECRET")
+
+	// Add your Cloudinary credentials ...
+	cld, _ := cloudinary.NewFromParams(CLOUD_NAME, API_KEY, API_SECRET)
+
+	// Upload file to Cloudinary ...
+	resp, err := cld.Upload.Upload(ctx, filepath, uploader.UploadParams{Folder: "waysbucks"})
+
+	if err != nil {
+		fmt.Println(err.Error())
+	}
 
 	price, _ := strconv.Atoi(r.FormValue("price"))
 	request := toppingdto.CreateTopping{
@@ -75,7 +95,7 @@ func (h *handlersTopping) CreateTopping(w http.ResponseWriter, r *http.Request) 
 	topping := models.Topping{
 		Title: request.Title,
 		Price: request.Price,
-		Image: filename,
+		Image: resp.SecureURL,
 	}
 
 	data, err := h.ToppingRepository.CreateTopping(topping)
