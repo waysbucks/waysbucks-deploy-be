@@ -81,10 +81,10 @@ func (h *handlersProduct) CreateProduct(w http.ResponseWriter, r *http.Request) 
 	cld, _ := cloudinary.NewFromParams(CLOUD_NAME, API_KEY, API_SECRET)
 
 	// Upload file to Cloudinary ...
-	resp, err := cld.Upload.Upload(ctx, filepath, uploader.UploadParams{Folder: "dumbmerch"});
+	resp, err := cld.Upload.Upload(ctx, filepath, uploader.UploadParams{Folder: "waysbucks"})
 
 	if err != nil {
-	fmt.Println(err.Error())
+		fmt.Println(err.Error())
 	}
 
 	price, _ := strconv.Atoi(r.FormValue("price"))
@@ -94,10 +94,10 @@ func (h *handlersProduct) CreateProduct(w http.ResponseWriter, r *http.Request) 
 	}
 
 	product := models.Product{
-		Title:   request.Title,
-		Price:  request.Price,
-		Image:  resp.SecureURL,
-	  }
+		Title: request.Title,
+		Price: request.Price,
+		Image: resp.SecureURL,
+	}
 
 	data, err := h.ProductRepository.CreateProduct(product)
 	if err != nil {
